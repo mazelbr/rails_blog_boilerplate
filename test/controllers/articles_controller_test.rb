@@ -22,7 +22,7 @@ class ArticlesControllerTest < ActionController::TestCase
 
   test "should create article" do
     assert_difference('Article.count') do
-      post :create, article: { content: @article.content, title: @article.title, user_id: @article.user_id }
+      post :create, article: { content: @article.content, title: @article.title}
     end
 
     assert_redirected_to article_path(assigns(:article))
@@ -39,7 +39,7 @@ class ArticlesControllerTest < ActionController::TestCase
   end
 
   test "should update article" do
-    patch :update, id: @article, article: { content: @article.content, title: @article.title, user_id: @article.user_id }
+    patch :update, id: @article, article: { content: @article.content, title: @article.title}
     assert_redirected_to article_path(assigns(:article))
   end
 
@@ -50,4 +50,29 @@ class ArticlesControllerTest < ActionController::TestCase
 
     assert_redirected_to articles_path
   end
+  
+  #restricctions
+  test "should only edit own articles" do
+    @article = articles(:two)
+    get   :edit, id: @article
+    assert_redirected_to root_path
+    assert_equal "You can't access Articles from other Users", flash[:error], "no or wrong message displayed"
+  end
+  
+  test "should only update own articles" do
+    @article = articles(:two)
+    patch :update, id: @article, article: { content: @article.content, title: @article.title}
+    assert_redirected_to root_path
+    assert_equal "You can't access Articles from other Users", flash[:error], "no or wrong message displayed"
+  end
+  
+  test "should only delete own articles" do
+    @article = articles(:two)
+    assert_no_difference('Article.count') do
+      delete :destroy, id: @article
+    end
+    assert_redirected_to root_path
+    assert_equal "You can't access Articles from other Users", flash[:error], "no or wrong message displayed"
+  end
+  
 end
