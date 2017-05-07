@@ -5,7 +5,7 @@ class ArticlesController < ApplicationController
   # GET /articles
   # GET /articles.json
   def index
-    @articles = current_user.articles.all
+    @articles = Article.all
   end
 
   # GET /articles/1
@@ -74,7 +74,7 @@ class ArticlesController < ApplicationController
     end
     
     def authorize_user
-      if user_signed_in? && current_user.id == @article.user_id
+      if authorize(@article)
         return true
       else
         redirect_to root_path
@@ -82,4 +82,10 @@ class ArticlesController < ApplicationController
         return false
       end
     end
+    
+    def authorize(instance_var)
+      user_signed_in? && current_user.id == instance_var.user_id
+    end
+    
+    helper_method :authorize
 end
